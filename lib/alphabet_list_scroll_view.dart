@@ -6,21 +6,22 @@ import 'package:vibration/vibration.dart';
 
 typedef IndexedHeight = double Function(int);
 
-class AlphabetScrollListHeader {
+class AlphabetScrollListTopSection {
   final List<Widget> widgetList;
   final Icon icon;
   final IndexedHeight indexedHeaderHeight;
 
-  AlphabetScrollListHeader({@required this.widgetList,
-    @required this.icon,
-    @required this.indexedHeaderHeight});
+  AlphabetScrollListTopSection(
+      {@required this.widgetList,
+      @required this.icon,
+      @required this.indexedHeaderHeight});
 }
 
-class _SpecialHeaderAlphabet {
+class _TopHeaderScrollAlphabet {
   final String id;
   final Icon icon;
 
-  _SpecialHeaderAlphabet(this.id, this.icon);
+  _TopHeaderScrollAlphabet(this.id, this.icon);
 }
 
 class AlphabetListScrollView extends StatefulWidget {
@@ -31,7 +32,7 @@ class AlphabetListScrollView extends StatefulWidget {
   final TextStyle normalTextStyle;
   final bool showPreview;
   final bool keyboardUsage;
-  final List<AlphabetScrollListHeader> headerWidgetList;
+  final List<AlphabetScrollListTopSection> topSectionList;
 
   const AlphabetListScrollView(
       {Key key,
@@ -40,9 +41,9 @@ class AlphabetListScrollView extends StatefulWidget {
       this.highlightTextStyle = const TextStyle(color: Colors.red),
       this.normalTextStyle = const TextStyle(color: Colors.black),
       this.showPreview = false,
-        this.headerWidgetList = const [],
-        @required this.indexedHeight,
-        this.keyboardUsage = false})
+      this.topSectionList = const [],
+      @required this.indexedHeight,
+      this.keyboardUsage = false})
       : super(key: key);
 
   @override
@@ -71,9 +72,9 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
   var totalHeight = 0.0;
   var heightList = <double>[];
   double maxLimit = 0;
-  List<_SpecialHeaderAlphabet> specialList = [];
-
+  List<_TopHeaderScrollAlphabet> topHeaderList = [];
   List<String> strList = [];
+  Map<String, List<String>> alphabetMapList = {};
 
   _initScrollCallback() {
     Observable(_pixelUpdates.stream).listen((pixels) {
@@ -82,7 +83,7 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
           ? controller.position.maxScrollExtent
           : 1;
       var tempSelectedIndex =
-      ((pixels / maxScrollExtent) * childLength).toInt();
+          ((pixels / maxScrollExtent) * childLength).toInt();
       if (tempSelectedIndex >= childLength) {
         tempSelectedIndex = childLength - 1;
       }
@@ -124,8 +125,8 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
 
   _updateStrList() {
     strList = [];
-    for (var i = 0; i < widget.headerWidgetList.length; i++) {
-      var header = widget.headerWidgetList[i];
+    for (var i = 0; i < widget.topSectionList.length; i++) {
+      var header = widget.topSectionList[i];
       for (var j = 0; j < header.widgetList.length; j++) {
         strList.add("x$i");
       }
@@ -179,14 +180,14 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
       }
       return a.compareTo(b);
     });
-    if (widget.headerWidgetList.length > 0) {
+    if (widget.topSectionList.length > 0) {
       totalHeight = 0;
-      for (var i = 0; i < widget.headerWidgetList.length; i++) {
-        var header = widget.headerWidgetList[i];
+      for (var i = 0; i < widget.topSectionList.length; i++) {
+        var header = widget.topSectionList[i];
         var id = "x$i";
         alphabetList.add(id);
         heightMap[id] = totalHeight;
-        specialList.add(_SpecialHeaderAlphabet(id, header.icon));
+        topHeaderList.add(_TopHeaderScrollAlphabet(id, header.icon));
         double headerHeight = 0;
         for (var j = 0; j < header.widgetList.length; j++) {
           headerHeight += header.indexedHeaderHeight(j);
@@ -195,31 +196,71 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
       }
     }
     for (var i = 0; i < tempList.length; i++) {
-      var currentStr = tempList[i][0];
-      _initAlphabetMap(currentStr, i);
+      var currentStr = tempList[i];
+      var currentAlphabet = currentStr[0];
+      _initAlphabetMap(currentStr, currentAlphabet, i);
     }
   }
 
   String _currentAlphabet = "";
 
-  _initAlphabetMap(String currentStr, int i) {
+  _initAlphabetMap(String currentStr, String currentAlphabet, int i) {
     var currentHeight = widget.indexedHeight(i);
     if (_currentAlphabet == "#") {
       return;
     }
 
-    if (currentStr.codeUnitAt(0) < 65 || currentStr.codeUnitAt(0) > 122) {
+    if (currentAlphabet.codeUnitAt(0) < 65 ||
+        currentAlphabet.codeUnitAt(0) > 122) {
       strMap["#"] = i;
       alphabetList.add("#");
       _currentAlphabet = "#";
       heightMap["#"] = totalHeight;
-    } else if (_currentAlphabet != currentStr) {
-      strMap[currentStr] = i;
-      alphabetList.add(currentStr);
-      _currentAlphabet = currentStr;
-      heightMap[currentStr] = totalHeight;
+      alphabetMapList[_currentAlphabet] = [currentStr];
+    } else if (_currentAlphabet != currentAlphabet) {
+      strMap[currentAlphabet] = i;
+      alphabetList.add(currentAlphabet);
+      _currentAlphabet = currentAlphabet;
+      heightMap[currentAlphabet] = totalHeight;
+      alphabetMapList[_currentAlphabet] = [currentStr];
+    } else {
+      if (alphabetMapList[currentAlphabet] != null) {
+        alphabetMapList[_currentAlphabet].add(currentStr);
+      }
     }
     totalHeight += currentHeight;
+  }
+
+  List<Widget> sliverList() {
+    List<Widget> tempList = [];
+    var mainIndex = 0;
+    for (var i = 0; i < alphabetList.length; i++) {
+      var currentAlphabet = alphabetList[i];
+      if (currentAlphabet.length > 1){
+        continue;
+      }
+      var currentStrList = alphabetMapList[currentAlphabet];
+      tempList.add(SliverAppBar(
+        title: Text(currentAlphabet),
+        pinned: true,
+primary: false,
+        floating: true,
+//        snap: true,
+
+      ));
+      tempList.add(
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+            mainIndex++;
+            return Container(
+              height: widget.indexedHeight(mainIndex),
+              child: widget.itemBuilder(context, mainIndex),
+            );
+          }, childCount: currentStrList.length),
+        ),
+      );
+    }
+    return tempList;
   }
 
   _getSideSizes() {
@@ -288,8 +329,8 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
 
   List<SliverList> _headerWidgetList() {
     List<SliverList> sliverList = [];
-    for (var i = 0; i < widget.headerWidgetList.length; i++) {
-      var headerWidget = widget.headerWidgetList[i];
+    for (var i = 0; i < widget.topSectionList.length; i++) {
+      var headerWidget = widget.topSectionList[i];
       List<Widget> widgetList = [];
       for (var j = 0; j < headerWidget.widgetList.length; j++) {
         widgetList.add(Container(
@@ -311,7 +352,7 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
     Widget textview;
     if (selectedIndex >= 0 && selectedIndex < alphabetList.length) {
       if (alphabetList[selectedIndex].length > 1) {
-        var header = specialList
+        var header = topHeaderList
             .firstWhere((sp) => sp.id == alphabetList[selectedIndex]);
         textview = IconTheme(
           data: IconThemeData(
@@ -341,15 +382,7 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
             controller: controller,
             slivers: <Widget>[
               ..._headerWidgetList(),
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  var currentIndex = index;
-                  return Container(
-                    height: widget.indexedHeight(index),
-                    child: widget.itemBuilder(context, currentIndex),
-                  );
-                }, childCount: widget.strList.length),
-              )
+              ...sliverList(),
             ],
           ),
           if (widget.showPreview)
@@ -372,8 +405,8 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
             ),
           _AlphabetListScollView(
             insideKey: _sideKey,
-            specialHeader: widget.headerWidgetList.isNotEmpty,
-            specialList: specialList,
+            specialHeader: widget.topSectionList.isNotEmpty,
+            specialList: topHeaderList,
             strList: alphabetList,
             selectedIndex: selectedIndex,
             keyboardUsage: widget.keyboardUsage,
@@ -402,7 +435,7 @@ class _AlphabetListScollView extends StatefulWidget {
   final TextStyle highlightTextStyle;
   final TextStyle normalTextStyle;
   final bool specialHeader;
-  final List<_SpecialHeaderAlphabet> specialList;
+  final List<_TopHeaderScrollAlphabet> specialList;
   final bool keyboardUsage;
 
   const _AlphabetListScollView({
@@ -442,7 +475,7 @@ class _AlphabetListScollViewState extends State<_AlphabetListScollView> {
 
       if (widget.strList[x].length > 1) {
         var header =
-        widget.specialList.firstWhere((sp) => sp.id == widget.strList[x]);
+            widget.specialList.firstWhere((sp) => sp.id == widget.strList[x]);
         textview = IconTheme(
           data: IconThemeData(
             size: 18,

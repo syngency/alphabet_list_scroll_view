@@ -158,8 +158,8 @@ class _MainAppState extends State<MainApp> {
               return 80;
             },
             keyboardUsage: true,
-            headerWidgetList: <AlphabetScrollListHeader>[
-              AlphabetScrollListHeader(widgetList: [
+            topSectionList: <AlphabetScrollListTopSection>[
+              AlphabetScrollListTopSection(widgetList: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: TextFormField(
@@ -175,7 +175,7 @@ class _MainAppState extends State<MainApp> {
                   ),
                 )
               ], icon: Icon(Icons.search), indexedHeaderHeight: (index) => 80),
-              AlphabetScrollListHeader(
+              AlphabetScrollListTopSection(
                   widgetList: favouriteList,
                   icon: Icon(Icons.star),
                   indexedHeaderHeight: (index) {
