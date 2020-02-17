@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:vibration/vibration.dart';
 
@@ -29,19 +30,23 @@ class AlphabetListScrollView extends StatefulWidget {
   final TextStyle normalTextStyle;
   final bool showPreview;
   final bool keyboardUsage;
+  final Color headerBackgroundColor;
+  final TextStyle headerTextStyle;
   final List<AlphabetScrollListTopSection> topSectionList;
 
-  const AlphabetListScrollView(
-      {Key key,
-      @required this.strList,
-      this.itemBuilder,
-      this.highlightTextStyle = const TextStyle(color: Colors.red),
-      this.normalTextStyle = const TextStyle(color: Colors.black),
-      this.showPreview = false,
-      this.topSectionList = const [],
-      @required this.indexedHeight,
-      this.keyboardUsage = false})
-      : super(key: key);
+  const AlphabetListScrollView({
+    Key key,
+    @required this.strList,
+    this.itemBuilder,
+    this.highlightTextStyle = const TextStyle(color: Colors.red),
+    this.normalTextStyle = const TextStyle(color: Colors.black),
+    this.showPreview = false,
+    this.topSectionList = const [],
+    @required this.indexedHeight,
+    this.keyboardUsage = false,
+    this.headerBackgroundColor,
+    this.headerTextStyle,
+  }) : super(key: key);
 
   @override
   _AlphabetListScrollViewState createState() => _AlphabetListScrollViewState();
@@ -227,15 +232,22 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
         continue;
       }
       var currentStrList = alphabetMapList[currentAlphabet];
-      tempList.add(SliverAppBar(
-        title: Text(currentAlphabet),
-        pinned: true,
-        primary: false,
-        floating: true,
-//        snap: true,
-      ));
-      tempList.add(
-        SliverList(
+      tempList.add(SliverStickyHeader(
+        header: new Container(
+          height: 60.0,
+          color: widget.headerBackgroundColor ?? Colors.blue,
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          alignment: Alignment.centerLeft,
+          child: new Text(
+            currentAlphabet,
+            style: widget.headerTextStyle ??
+                const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+          ),
+        ),
+        sliver: SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
             mainIndex++;
             return Container(
@@ -244,7 +256,7 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
             );
           }, childCount: currentStrList.length),
         ),
-      );
+      ));
     }
     return tempList;
   }

@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   vibration: ^1.2.4
   rxdart: ^0.23.1
+  flutter_sticky_header: ^0.4.1
+
 
 dev_dependencies:
   flutter_test:

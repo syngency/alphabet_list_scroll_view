@@ -35,8 +35,7 @@ class _MainAppState extends State<MainApp> {
       var name = faker.person.name();
       userList.add(User(name, faker.company.name(), true));
     }
-    userList
-        .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    userList.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     filterList();
     searchController.addListener(() {
       filterList();
@@ -51,10 +50,7 @@ class _MainAppState extends State<MainApp> {
     normalList = [];
     strList = [];
     if (searchController.text.isNotEmpty) {
-      users.retainWhere((user) =>
-          user.name
-              .toLowerCase()
-              .contains(searchController.text.toLowerCase()));
+      users.retainWhere((user) => user.name.toLowerCase().contains(searchController.text.toLowerCase()));
     }
     users.forEach((user) {
       if (user.favourite) {
@@ -76,8 +72,7 @@ class _MainAppState extends State<MainApp> {
               leading: Stack(
                 children: <Widget>[
                   CircleAvatar(
-                    backgroundImage:
-                    NetworkImage("http://placeimg.com/200/200/people"),
+                    backgroundImage: NetworkImage("http://placeimg.com/200/200/people"),
                   ),
                   Container(
                       height: 40,
@@ -112,8 +107,7 @@ class _MainAppState extends State<MainApp> {
             ],
             child: ListTile(
               leading: CircleAvatar(
-                backgroundImage:
-                NetworkImage("http://placeimg.com/200/200/people"),
+                backgroundImage: NetworkImage("http://placeimg.com/200/200/people"),
               ),
               title: Text(user.name),
               subtitle: Text(user.company),
@@ -142,47 +136,48 @@ class _MainAppState extends State<MainApp> {
     var currentStr = "";
     return MaterialApp(
         home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Plugin example app'),
-          ),
-          body: AlphabetListScrollView(
-            strList: strList,
-            highlightTextStyle: TextStyle(
-              color: Colors.yellow,
-            ),
-            showPreview: true,
-            itemBuilder: (context, index) {
-              return normalList[index];
-            },
-            indexedHeight: (i) {
-              return 80;
-            },
-            keyboardUsage: true,
-            topSectionList: <AlphabetScrollListTopSection>[
-              AlphabetScrollListTopSection(widgetList: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      suffix: Icon(
-                        Icons.search,
-                        color: Colors.grey,
-                      ),
-                      labelText: "Search",
-                    ),
+      appBar: AppBar(
+        title: const Text('Plugin example app'),
+      ),
+      body: AlphabetListScrollView(
+        headerBackgroundColor: Colors.red,
+        strList: strList,
+        highlightTextStyle: TextStyle(
+          color: Colors.yellow,
+        ),
+        showPreview: true,
+        itemBuilder: (context, index) {
+          return normalList[index];
+        },
+        indexedHeight: (i) {
+          return 80;
+        },
+        keyboardUsage: true,
+        topSectionList: <AlphabetScrollListTopSection>[
+          AlphabetScrollListTopSection(widgetList: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextFormField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  suffix: Icon(
+                    Icons.search,
+                    color: Colors.grey,
                   ),
-                )
-              ], icon: Icon(Icons.search), indexedHeaderHeight: (index) => 80),
-              AlphabetScrollListTopSection(
-                  widgetList: favouriteList,
-                  icon: Icon(Icons.star),
-                  indexedHeaderHeight: (index) {
-                    return 80;
-                  }),
-            ],
-          ),
-        ));
+                  labelText: "Search",
+                ),
+              ),
+            )
+          ], icon: Icon(Icons.search), indexedHeaderHeight: (index) => 80),
+          AlphabetScrollListTopSection(
+              widgetList: favouriteList,
+              icon: Icon(Icons.star),
+              indexedHeaderHeight: (index) {
+                return 80;
+              }),
+        ],
+      ),
+    ));
   }
 }
