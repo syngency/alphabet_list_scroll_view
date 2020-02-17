@@ -11,10 +11,7 @@ class AlphabetScrollListTopSection {
   final Icon icon;
   final IndexedHeight indexedHeaderHeight;
 
-  AlphabetScrollListTopSection(
-      {@required this.widgetList,
-      @required this.icon,
-      @required this.indexedHeaderHeight});
+  AlphabetScrollListTopSection({@required this.widgetList, @required this.icon, @required this.indexedHeaderHeight});
 }
 
 class _TopHeaderScrollAlphabet {
@@ -77,13 +74,10 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
   Map<String, List<String>> alphabetMapList = {};
 
   _initScrollCallback() {
-    Observable(_pixelUpdates.stream).listen((pixels) {
+    _pixelUpdates.stream.listen((pixels) {
       var childLength = strList.length;
-      double maxScrollExtent = controller.position.maxScrollExtent > 0
-          ? controller.position.maxScrollExtent
-          : 1;
-      var tempSelectedIndex =
-          ((pixels / maxScrollExtent) * childLength).toInt();
+      double maxScrollExtent = controller.position.maxScrollExtent > 0 ? controller.position.maxScrollExtent : 1;
+      var tempSelectedIndex = ((pixels / maxScrollExtent) * childLength).toInt();
       if (tempSelectedIndex >= childLength) {
         tempSelectedIndex = childLength - 1;
       }
@@ -167,15 +161,9 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
     var tempList = widget.strList;
     tempList.sort();
     tempList.sort((a, b) {
-      if (a.codeUnitAt(0) < 65 ||
-          a.codeUnitAt(0) > 122 &&
-              b.codeUnitAt(0) >= 65 &&
-              b.codeUnitAt(0) <= 122) {
+      if (a.codeUnitAt(0) < 65 || a.codeUnitAt(0) > 122 && b.codeUnitAt(0) >= 65 && b.codeUnitAt(0) <= 122) {
         return 1;
-      } else if (b.codeUnitAt(0) < 65 ||
-          b.codeUnitAt(0) > 122 &&
-              a.codeUnitAt(0) >= 65 &&
-              a.codeUnitAt(0) <= 122) {
+      } else if (b.codeUnitAt(0) < 65 || b.codeUnitAt(0) > 122 && a.codeUnitAt(0) >= 65 && a.codeUnitAt(0) <= 122) {
         return -1;
       }
       return a.compareTo(b);
@@ -210,8 +198,7 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
       return;
     }
 
-    if (currentAlphabet.codeUnitAt(0) < 65 ||
-        currentAlphabet.codeUnitAt(0) > 122) {
+    if (currentAlphabet.codeUnitAt(0) < 65 || currentAlphabet.codeUnitAt(0) > 122) {
       strMap["#"] = i;
       alphabetList.add("#");
       _currentAlphabet = "#";
@@ -236,17 +223,16 @@ class _AlphabetListScrollViewState extends State<AlphabetListScrollView> {
     var mainIndex = 0;
     for (var i = 0; i < alphabetList.length; i++) {
       var currentAlphabet = alphabetList[i];
-      if (currentAlphabet.length > 1){
+      if (currentAlphabet.length > 1) {
         continue;
       }
       var currentStrList = alphabetMapList[currentAlphabet];
       tempList.add(SliverAppBar(
         title: Text(currentAlphabet),
         pinned: true,
-primary: false,
+        primary: false,
         floating: true,
 //        snap: true,
-
       ));
       tempList.add(
         SliverList(
@@ -352,8 +338,7 @@ primary: false,
     Widget textview;
     if (selectedIndex >= 0 && selectedIndex < alphabetList.length) {
       if (alphabetList[selectedIndex].length > 1) {
-        var header = topHeaderList
-            .firstWhere((sp) => sp.id == alphabetList[selectedIndex]);
+        var header = topHeaderList.firstWhere((sp) => sp.id == alphabetList[selectedIndex]);
         textview = IconTheme(
           data: IconThemeData(
             color: Colors.white,
@@ -474,14 +459,11 @@ class _AlphabetListScollViewState extends State<_AlphabetListScollView> {
       Widget textview;
 
       if (widget.strList[x].length > 1) {
-        var header =
-            widget.specialList.firstWhere((sp) => sp.id == widget.strList[x]);
+        var header = widget.specialList.firstWhere((sp) => sp.id == widget.strList[x]);
         textview = IconTheme(
           data: IconThemeData(
             size: 18,
-            color: widget.selectedIndex == x
-                ? widget.highlightTextStyle.color
-                : widget.normalTextStyle.color,
+            color: widget.selectedIndex == x ? widget.highlightTextStyle.color : widget.normalTextStyle.color,
           ),
           child: header.icon,
         );
@@ -489,9 +471,7 @@ class _AlphabetListScollViewState extends State<_AlphabetListScollView> {
         textview = Text(
           widget.strList[x],
           textAlign: TextAlign.justify,
-          style: widget.selectedIndex == x
-              ? widget.highlightTextStyle
-              : widget.normalTextStyle,
+          style: widget.selectedIndex == x ? widget.highlightTextStyle : widget.normalTextStyle,
         );
       }
       charList.add(Padding(
